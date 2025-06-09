@@ -1,6 +1,6 @@
-import { createAdminClient, SESSION_COOKIE } from '$lib/appwrite';
-import { error, redirect } from '@sveltejs/kit';
-import { ID, OAuthProvider } from 'node-appwrite';
+import { createAdminClient } from '$lib/appwrite';
+import { redirect } from '@sveltejs/kit';
+import { OAuthProvider } from 'node-appwrite';
 
 export const actions = {
 	oauth: async (event) => {

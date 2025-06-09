@@ -31,7 +31,6 @@
 				throw new Error('Missing encryption metadata from server.');
 			}
 
-			// 3. Get the encrypted file content as an ArrayBuffer
 			const encryptedArrayBuffer = await res.arrayBuffer();
 			const encryptedBlob = new Blob([encryptedArrayBuffer]);
 
