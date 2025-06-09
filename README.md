@@ -34,7 +34,7 @@ A modern, secure file sharing platform built with SvelteKit and Appwrite. Uppies
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/sxxxnx/uppies.git
    cd uppies
    ```
 
