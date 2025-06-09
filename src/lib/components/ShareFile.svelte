@@ -5,6 +5,9 @@
 	import { get } from 'svelte/store';
 
 	let fileInput: HTMLInputElement;
+	let description = $state('');
+	let title = $state('');
+
 	let isLoading = $state(false);
 	let shareableLink = $state('');
 	let statusMessage = $state('');
@@ -63,6 +66,9 @@
 			formData.append('encryptedLinkPassword', encryptedLinkPassword);
 			formData.append('linkPasswordSalt', arrayBufferToBase64(linkPasswordSalt));
 			formData.append('linkPasswordIv', arrayBufferToBase64(linkPasswordIv));
+			formData.append('title', title);
+			formData.append('description', description);
+            formData.append('contentType', file.type)
 
 			statusMessage = 'Uploading encrypted data...';
 			const response = await fetch(formElement.action, {
@@ -100,6 +106,9 @@
 		enctype="multipart/form-data"
 		use:enhance={handleSubmit}
 	>
+		<input type="text" name="title" id="tiele" bind:value={title} />
+		<textarea name="description" id="description" bind:value={description}></textarea>
+
 		<input type="file" bind:this={fileInput} required />
 
 		<button type="submit" disabled={isLoading}>

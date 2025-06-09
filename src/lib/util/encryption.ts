@@ -1,5 +1,3 @@
-import * as argon2 from 'argon2-browser';
-
 function arrayBufferToBase64(buffer: ArrayBuffer) {
 	let binary = '';
 
