@@ -6,14 +6,24 @@ import { ID, Query } from 'node-appwrite';
 export async function handle({ event, resolve }) {
 	try {
 		const sessionCookie = event.cookies.get(SESSION_COOKIE);
-
 		if (!sessionCookie) {
 			event.locals.user = undefined;
 			return resolve(event);
 		}
-
 		const { account } = createSessionClient(event);
-		const user = await account.get();
+
+		let user;
+		try {
+			user = await account.get();
+		} catch (accountError) {
+			console.error('Failed to get user from account.get():', accountError);
+			// If the session is invalid, clear the cookie
+			event.cookies.delete(SESSION_COOKIE, { path: '/' });
+			event.locals.user = undefined;
+			event.locals.userRecord = undefined;
+			return resolve(event);
+		}
+
 		const { database } = createAdminClient();
 
 		// Check if user record exists in database
@@ -67,14 +77,11 @@ export async function handle({ event, resolve }) {
 
 				console.log('Reset upload cap for user:', user.email);
 			}
-		}
-
-		// Attach user record to locals for use in other parts of the app
+		}		// Attach user record to locals for use in other parts of the app
 		event.locals.user = user;
 		event.locals.userRecord = userRecord;
-
 	} catch (error) {
-		console.error('Authentication error');
+		console.error('Authentication error:', error);
 		event.cookies.delete(SESSION_COOKIE, { path: '/' });
 		event.locals.user = undefined;
 		event.locals.userRecord = undefined;

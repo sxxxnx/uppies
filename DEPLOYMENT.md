@@ -265,7 +265,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    
+
     - name: Deploy to server
       uses: appleboy/ssh-action@v0.1.5
       with:

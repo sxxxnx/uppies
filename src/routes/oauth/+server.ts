@@ -17,19 +17,19 @@ export async function GET(event) {
 		console.error('OAuth callback missing required parameters');
 		return new Response('Missing `userId` or `secret` query params', { status: 400 });
 	}
-
 	try {
 		const { account } = createAdminClient();
 		const session = await account.createSession(userId, secret);
 
-		console.log('OAuth session created successfully');
-		event.cookies.set(SESSION_COOKIE, session.secret, {
-			sameSite: 'strict',
+		const cookieOptions = {
+			sameSite: 'lax' as const, // Better for OAuth flows
 			expires: new Date(session.expire),
-			secure: !dev,
+			secure: !dev && event.url.protocol === 'https:', // Only secure if HTTPS
 			path: '/',
 			httpOnly: true
-		});
+		};
+
+		event.cookies.set(SESSION_COOKIE, session.secret, cookieOptions);
 	} catch (error) {
 		console.error('OAuth session creation failed:', error);
 		const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
