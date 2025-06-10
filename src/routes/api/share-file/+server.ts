@@ -23,7 +23,13 @@ export async function POST(event) {
 	const description = formData.get('description') as string;
 	const contentType = formData.get('contentType') as string;
 	const fileExtention = formData.get('fileExtention') as string;
-    const fileSize = formData.get('fileSize') as string
+	const fileSize = formData.get('fileSize') as string;
+
+	if (fileSize > event.locals.userRecord.fileSizeLimit)
+		return error(
+			413,
+			`File exceeds the ${event.locals.userRecord.fileSizeLimit / 1024 / 1024}MB Limit.`
+		);
 
 	const allowedContentTypes = [
 		// Common Documents
@@ -74,7 +80,8 @@ export async function POST(event) {
 		fileId: uploadedFile.$id,
 		contentType,
 		fileExtention: fileExtention ?? '',
-		userId: event.locals.user.$id	}); // Only increment upload cap after successful upload and database creation
+		userId: event.locals.user.$id
+	}); // Only increment upload cap after successful upload and database creation
 	const currentUploadCap = event.locals.userRecord.uploadCap || 0;
 	const newUploadCap = currentUploadCap + 1;
 
