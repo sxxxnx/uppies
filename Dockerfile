@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
 # Install bun
 RUN npm install -g bun
@@ -8,13 +8,13 @@ WORKDIR /app
 # Copy package files
 COPY package.json bun.lock* ./
 
-# Install dependencies
+# Install ALL dependencies
 RUN bun install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
-# Build args (these will be passed from docker-compose)
+# Build args
 ARG VITE_PUBLIC_APPWRITE_ENDPOINT
 ARG VITE_PUBLIC_APPWRITE_PROJECT_ID
 ARG APPWRITE_API_SECRET
@@ -27,33 +27,15 @@ ENV APPWRITE_API_SECRET=$APPWRITE_API_SECRET
 # Build the application
 RUN bun run build
 
-# Production stage
-FROM node:20-alpine AS production
-
-WORKDIR /app
-
-# Copy package files
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/bun.lock* ./
-
-# Install ONLY production dependencies with npm (more reliable for production)
-RUN npm ci --only=production
-
-# Copy built application from builder stage
-COPY --from=builder /app/build ./build
-
 # Create non-root user for security
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 && \
+    chown -R nextjs:nodejs /app
 
-# Change ownership of the app directory
-RUN chown -R nextjs:nodejs /app
 USER nextjs
 
 # Expose port
 EXPOSE 3000
-
-# Set environment variable for port
 ENV PORT=3000
 
 # Start the application
