@@ -4,6 +4,8 @@
 	import { page } from '$app/state';
 
 	$: authError = page.url.searchParams.get('error') === 'auth_failed';
+	$: Unauthorized = page.url.searchParams.get('error') === 'unauthorized';
+	$: sourcePage = page.url.searchParams.get('source');
 </script>
 
 <svelte:head>
@@ -32,6 +34,14 @@
 				<div class="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-3">
 					<AlertCircle class="h-5 w-5 text-red-400" />
 					<p class="text-sm text-red-300">Authentication failed. Please try signing in again.</p>
+				</div>
+			{:else if Unauthorized}
+				<div class="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-3">
+					<AlertCircle class="h-5 w-5 text-red-400" />
+					<p class="text-sm text-red-300">
+						You need to signed in to preform that action.
+						<span>Source: {sourcePage ?? 'Unkown'}</span>
+					</p>
 				</div>
 			{/if}
 

@@ -40,7 +40,8 @@ export async function POST({ request, locals }) {
 		LinkEncPasswordIv: linkPasswordIv,
 		fileId: uploadedFile.$id,
 		contentType,
-		fileExtention: fileExtention ?? ''
+		fileExtention: fileExtention ?? '',
+		userId: locals.user.$id
 	});
 
 	return json({ fileID: media.$id }, { status: 201 });

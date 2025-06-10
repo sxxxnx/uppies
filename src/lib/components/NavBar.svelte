@@ -2,23 +2,11 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { getInitials } from '$lib/util/appwrite';
 	import { Button, DropdownMenu, Avatar } from 'bits-ui';
 	import { LogOut, User } from 'lucide-svelte';
 
 	let { data } = $props();
-	function getInitials(name: string) {
-		if (!name) return 'U';
-
-		const words = name
-			.trim()
-			.split(' ')
-			.filter((word) => word.length > 0);
-
-		if (words.length === 0) return 'U';
-		if (words.length === 1) return words[0].charAt(0).toUpperCase();
-
-		return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
-	}
 </script>
 
 <nav class="border-b-border flex flex-row items-center justify-between border-b px-5 py-3">
@@ -80,8 +68,16 @@
 							<DropdownMenu.Item
 								class="hover:bg-container-secondary focus:bg-container-secondary flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none"
 							>
-								<User class="h-4 w-4 text-neutral-400" />
-								<span class="text-neutral-200">Profile</span>
+								<button
+									type="button"
+									class="flex w-full items-center gap-2 text-left"
+									on:click={() => goto('/profile')}
+									tabindex="-1"
+									style="background: none; border: none; padding: 0; margin: 0;"
+								>
+									<User class="h-4 w-4 text-neutral-400" />
+									<span class="text-neutral-200">Profile</span>
+								</button>
 							</DropdownMenu.Item>
 
 							<DropdownMenu.Separator class="bg-border my-1 h-px" />
