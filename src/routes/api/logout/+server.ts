@@ -1,5 +1,5 @@
 import { createSessionClient, SESSION_COOKIE } from '$lib/appwrite';
-import { redirect } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 
 export async function POST(event) {
 	const { account } = createSessionClient(event);
@@ -7,5 +7,5 @@ export async function POST(event) {
 	await account.deleteSession('current');
 	event.cookies.delete(SESSION_COOKIE, { path: '/' });
 
-	return redirect(302, '/signup');
+	return json({ success: true });
 }

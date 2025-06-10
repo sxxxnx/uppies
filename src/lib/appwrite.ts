@@ -15,7 +15,6 @@ export function createAdminClient() {
 		.setProject(VITE_PUBLIC_APPWRITE_PROJECT_ID)
 		.setKey(env.APPWRITE_API_SECRET as string);
 
-	// Return the services we want to use.
 	return {
 		get account() {
 			return new Account(client);

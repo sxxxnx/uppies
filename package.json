@@ -40,6 +40,8 @@
 	"dependencies": {
 		"@types/node": "^22.15.30",
 		"bits-ui": "^2.5.0",
-		"node-appwrite": "^17.0.0"
+		"lucide-svelte": "^0.513.0",
+		"node-appwrite": "^17.0.0",
+		"plyr": "^3.7.8"
 	}
 }

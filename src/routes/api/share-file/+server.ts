@@ -18,7 +18,8 @@ export async function POST({ request, locals }) {
 	const linkPasswordIv = formData.get('linkPasswordIv') as string;
 	const title = formData.get('title') as string;
 	const description = formData.get('description') as string;
-    const contentType = formData.get('contentType') as string;
+	const contentType = formData.get('contentType') as string;
+	const fileExtention = formData.get('fileExtention') as string;
 
 	const uploadedFile = await session.storage.createFile('public', ID.unique(), encryptedFile, [
 		Permission.write(Role.user(locals.user?.$id)),
@@ -38,7 +39,8 @@ export async function POST({ request, locals }) {
 		LinkEncPasswordSalt: linkPasswordSalt,
 		LinkEncPasswordIv: linkPasswordIv,
 		fileId: uploadedFile.$id,
-        contentType
+		contentType,
+		fileExtention: fileExtention ?? ''
 	});
 
 	return json({ fileID: media.$id }, { status: 201 });

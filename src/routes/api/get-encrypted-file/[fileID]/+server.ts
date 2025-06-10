@@ -15,7 +15,8 @@ export async function GET({ params }) {
 		'Content-Type': 'application/octet-stream',
 		'X-File-Salt': record.encSalt,
 		'X-File-Iv': record.encIv,
-		'X-File-Content-Type': record.contentType
+		'X-File-Content-Type': record.contentType,
+		'X-File-Extention': record.fileExtention
 	};
 
 	const file = await session.storage.getFileView('public', record.fileId);

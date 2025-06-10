@@ -11,9 +11,6 @@ export const actions = {
 			`${event.url.origin}/oauth`,
 			`${event.url.origin}/signup`
 		);
-
-		console.log('OAuth redirect URL:', redirectUrl);
-
 		redirect(302, redirectUrl);
 	}
 };
