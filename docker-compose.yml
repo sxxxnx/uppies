@@ -9,7 +9,8 @@ services:
         - VITE_PUBLIC_APPWRITE_PROJECT_ID=${VITE_PUBLIC_APPWRITE_PROJECT_ID}
         - APPWRITE_API_SECRET=${APPWRITE_API_SECRET}
     ports:
-      - '3000:3000'
+      - '80:3000' # Map host port 80 to container port 3000
+      - '443:3000' # For SSL (if using direct SSL in container)
     restart: unless-stopped
     environment:
       - NODE_ENV=production
