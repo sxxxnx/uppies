@@ -16,9 +16,39 @@ export async function handle({ event, resolve }) {
 		const user = await account.get();
 
 		if (!user.prefs.profilePicture) {
-			account.updatePrefs({
+			await account.updatePrefs({
 				profilePicture: generateGravatarUrl(user.email)
 			});
+		}
+		if (!user.prefs.uploadCap) {
+			// Set initial upload cap and next reset date (1 month from now)
+			const nextResetDate = new Date();
+			nextResetDate.setMonth(nextResetDate.getMonth() + 1);
+
+			await account.updatePrefs({
+				uploadCap: 0,
+				uploadCapSetDate: new Date(),
+				uploadCapResetDate: nextResetDate
+			});
+		}
+		// Check if it's time to reset the upload cap (monthly reset)
+		if (user.prefs.uploadCapResetDate && new Date() >= new Date(user.prefs.uploadCapResetDate)) {
+			// Only reset if we haven't already reset today (prevent multiple resets)
+			const today = new Date().toDateString();
+			const lastResetDate = user.prefs.uploadCapSetDate
+				? new Date(user.prefs.uploadCapSetDate).toDateString()
+				: null;
+
+			if (lastResetDate !== today) {
+				const nextResetDate = new Date();
+				nextResetDate.setMonth(nextResetDate.getMonth() + 1);
+
+				await account.updatePrefs({
+					uploadCap: 0, // Reset to 0
+					uploadCapSetDate: new Date(),
+					uploadCapResetDate: nextResetDate
+				});
+			}
 		}
 
 		event.locals.user = user;

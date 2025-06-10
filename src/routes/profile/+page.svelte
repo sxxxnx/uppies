@@ -133,34 +133,34 @@
 
 <div class="flex flex-col">
 	<!-- Profile Header -->
-	<div class="bg-container border-b-border flex flex-row items-center gap-3 border-b px-8 py-12">
-		<Avatar.Root class="h-20 w-20">
+	<div class="bg-container border-b-border flex flex-col sm:flex-row items-center gap-3 border-b px-4 sm:px-8 py-8 sm:py-12">
+		<Avatar.Root class="h-16 w-16 sm:h-20 sm:w-20">
 			<Avatar.Image
 				src={data.user?.prefs?.profilePicture}
 				alt={data.user?.name}
 				class="rounded-full"
 			/>
 			<Avatar.Fallback
-				class="bg-accent flex items-center justify-center rounded-full text-2xl font-medium text-white"
+				class="bg-accent flex items-center justify-center rounded-full text-xl sm:text-2xl font-medium text-white"
 			>
 				{getInitials(data.user?.name || '')}
 			</Avatar.Fallback>
 		</Avatar.Root>
-		<div class="flex flex-col">
-			<h1 class="text-4xl font-medium text-white">{data.user?.name}</h1>
+		<div class="flex flex-col text-center sm:text-left">
+			<h1 class="text-2xl sm:text-4xl font-medium text-white">{data.user?.name}</h1>
 			<p class="text-neutral-400">{data.user?.email}</p>
 		</div>
 	</div>
 
 	<!-- Media Files Section -->
-	<div class="p-8">
+	<div class="p-4 sm:p-8">
 		<div class="mb-6">
-			<h2 class="mb-2 text-2xl font-medium text-white">Your Files</h2>
+			<h2 class="mb-2 text-xl sm:text-2xl font-medium text-white">Your Files</h2>
 			<p class="text-neutral-400">Manage your uploaded and encrypted files</p>
 		</div>
-
 		{#if data.media && data.media.length > 0}
-			<div class="bg-container border-border overflow-hidden rounded-xl border">
+			<!-- Desktop Table View -->
+			<div class="bg-container border-border overflow-hidden rounded-xl border hidden lg:block">
 				<!-- Table Header -->
 				<div class="bg-container-secondary border-b-border border-b px-6 py-4">
 					<div class="grid grid-cols-6 gap-4 text-sm font-medium text-neutral-300">
@@ -214,6 +214,55 @@
 					{/each}
 				</div>
 			</div>
+
+			<!-- Mobile Card View -->
+			<div class="space-y-4 lg:hidden">
+				{#each data.media as media, index}
+					<div class="bg-container border-border rounded-xl border p-4">
+						<div class="space-y-3">
+							<!-- Title and Extension -->
+							<div class="flex items-start justify-between">
+								<div class="min-w-0 flex-1">
+									<h3 class="font-medium text-white truncate" title={media.Title}>
+										{media.Title || 'Untitled'}
+									</h3>
+									<p class="text-xs text-neutral-400 mt-1">
+										{formatDate(media.$createdAt)}
+									</p>
+								</div>
+								<span class="bg-accent/20 text-accent rounded-md px-2 py-1 text-xs font-medium ml-2">
+									.{media.fileExtention}
+								</span>
+							</div>
+
+							<!-- Content Type -->
+							<div class="flex justify-between text-sm">
+								<span class="text-neutral-400">Content Type:</span>
+								<span class="text-neutral-300">{media.contentType || 'Unknown'}</span>
+							</div>
+
+							<!-- Encrypted Password -->
+							<div class="flex justify-between text-sm">
+								<span class="text-neutral-400">Encrypted Password:</span>
+								<span class="font-mono text-xs text-neutral-500">
+									{media.encPassword ? '••••••••••••••••' : 'Not set'}
+								</span>
+							</div>
+
+							<!-- Action Button -->
+							<div class="pt-2">
+								<Button.Root
+									onclick={() => openRegenerateModal(media)}
+									class="bg-container-secondary hover:bg-accent hover:border-accent/100 border-border flex items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm transition-all w-full"
+								>
+									<RefreshCw class="size-4" />
+									Regenerate Link
+								</Button.Root>
+							</div>
+						</div>
+					</div>
+				{/each}
+			</div>
 		{:else}
 			<div class="bg-container border-border rounded-xl border p-12 text-center">
 				<div class="mb-4 text-neutral-400">
@@ -242,9 +291,8 @@
 <!-- Regenerate Link Modal -->
 <Dialog.Root bind:open={showRegenerateModal} onOpenChange={(open) => !open && closeModal()}>
 	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
-		<Dialog.Content
-			class="bg-container border-border fixed top-[50%] left-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] rounded-xl border p-6 shadow-lg"
+		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />		<Dialog.Content
+			class="bg-container border-border fixed top-[50%] left-[50%] z-50 w-[calc(100vw-2rem)] max-w-md translate-x-[-50%] translate-y-[-50%] rounded-xl border p-4 sm:p-6 shadow-lg"
 		>
 			<div class="mb-4 flex items-center justify-between">
 				<Dialog.Title class="text-lg font-medium text-white">Regenerate Share Link</Dialog.Title>
@@ -260,33 +308,35 @@
 				<div class="space-y-4">
 					<Dialog.Description class="text-sm text-neutral-300">
 						Your link has been successfully regenerated. Copy the link below and share it.
-					</Dialog.Description>
-					<div class="flex items-center gap-2">
-						<input
-							type="text"
-							readonly
-							value={regeneratedLink}
-							class="bg-container-secondary border-border w-full flex-1 rounded-xl border px-3 py-2 font-mono text-xs text-neutral-300"
-						/>
-						<Button.Root
-							onclick={copyRegeneratedLink}
-							class="bg-accent hover:bg-accent/90 flex items-center gap-2 rounded-xl px-4 py-2 text-white transition-all"
-						>
-							{#if isLinkCopied}
-								<svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								Copied!
-							{:else}
-								<Copy class="size-4" />
-								Copy
-							{/if}
-						</Button.Root>
+					</Dialog.Description>					<div class="space-y-3">
+						<label class="block text-sm font-medium text-neutral-300">Generated Link:</label>
+						<div class="flex flex-col sm:flex-row gap-2">
+							<input
+								type="text"
+								readonly
+								value={regeneratedLink}
+								class="bg-container-secondary border-border w-full flex-1 rounded-xl border px-3 py-2 font-mono text-xs text-neutral-300"
+							/>
+							<Button.Root
+								onclick={copyRegeneratedLink}
+								class="bg-accent hover:bg-accent/90 flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-white transition-all whitespace-nowrap"
+							>
+								{#if isLinkCopied}
+									<svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+									Copied!
+								{:else}
+									<Copy class="size-4" />
+									Copy
+								{/if}
+							</Button.Root>
+						</div>
 					</div>
 					<Button.Root
 						onclick={closeModal}
@@ -318,19 +368,17 @@
 						<div class="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
 							{regenerateError}
 						</div>
-					{/if}
-
-					<div class="flex gap-3 pt-2">
+					{/if}					<div class="flex flex-col sm:flex-row gap-3 pt-2">
 						<Button.Root
 							onclick={closeModal}
-							class="bg-container-secondary hover:bg-container border-border flex-1 rounded-xl border px-4 py-2 text-neutral-300 transition-all"
+							class="bg-container-secondary hover:bg-container border-border flex-1 rounded-xl border px-4 py-2 text-neutral-300 transition-all order-2 sm:order-1"
 						>
 							Cancel
 						</Button.Root>
 						<Button.Root
 							onclick={handleRegenerateLink}
 							disabled={isRegenerating}
-							class="bg-accent hover:bg-accent/90 disabled:bg-accent/50 flex flex-1 items-center justify-center rounded-xl px-4 py-2 text-white transition-all disabled:cursor-not-allowed"
+							class="bg-accent hover:bg-accent/90 disabled:bg-accent/50 flex flex-1 items-center justify-center rounded-xl px-4 py-2 text-white transition-all disabled:cursor-not-allowed order-1 sm:order-2"
 						>
 							{#if isRegenerating}
 								<RefreshCw class="mr-2 size-4 animate-spin" />
