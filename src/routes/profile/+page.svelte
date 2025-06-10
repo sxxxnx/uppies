@@ -73,7 +73,7 @@
 			console.error('Failed to copy link:', error);
 		}
 	}
-	// Placeholder function for regenerate link logic
+	// function for regenerate link logic
 	async function handleRegenerateLink() {
 		if (!masterKeyInput.trim()) {
 			regenerateError = 'Please enter your master key';
@@ -88,7 +88,7 @@
 		isRegenerating = true;
 		regenerateError = '';
 
-		try {   
+		try {
 			const [result] = await Promise.all([
 				(async () => {
 					const encryptedLinkPaswordBase64 = selectedMedia.encPassword;
