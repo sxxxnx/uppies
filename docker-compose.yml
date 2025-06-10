@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  uppies:
+    build:
+      context: .
+      args:
+        - VITE_PUBLIC_APPWRITE_ENDPOINT=${VITE_PUBLIC_APPWRITE_ENDPOINT}
+        - VITE_PUBLIC_APPWRITE_PROJECT_ID=${VITE_PUBLIC_APPWRITE_PROJECT_ID}
+        - APPWRITE_API_SECRET=${APPWRITE_API_SECRET}
+    ports:
+      - '3000:3000'
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - VITE_PUBLIC_APPWRITE_ENDPOINT=${VITE_PUBLIC_APPWRITE_ENDPOINT}
+      - VITE_PUBLIC_APPWRITE_PROJECT_ID=${VITE_PUBLIC_APPWRITE_PROJECT_ID}
+      - APPWRITE_API_SECRET=${APPWRITE_API_SECRET}
