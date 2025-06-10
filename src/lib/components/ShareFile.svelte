@@ -90,6 +90,7 @@
 			formData.append('title', title);
 			formData.append('description', description);
 			formData.append('contentType', file.type);
+			formData.append('fileSize', file.size.toString());
 
 			const fileExtenion = file.name.split('.').pop() ?? '';
 

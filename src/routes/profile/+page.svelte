@@ -133,10 +133,9 @@
 
 <div class="flex flex-col">
 	<!-- Profile Header -->
-	<div class="bg-container border-b-border flex flex-col sm:flex-row items-center gap-3 border-b px-4 sm:px-8 py-8 sm:py-12">
-		<Avatar.Root class="h-16 w-16 sm:h-20 sm:w-20">
+	<div class="bg-container border-b-border flex flex-col sm:flex-row items-center gap-3 border-b px-4 sm:px-8 py-8 sm:py-12">		<Avatar.Root class="h-16 w-16 sm:h-20 sm:w-20">
 			<Avatar.Image
-				src={data.user?.prefs?.profilePicture}
+				src={data.userRecord?.profilePicture || data.user?.prefs?.profilePicture}
 				alt={data.user?.name}
 				class="rounded-full"
 			/>

@@ -14,7 +14,8 @@ export const load = async ({ locals }) => {
 		]);
 
 		return {
-			media: media.documents
+			media: media.documents,
+			userRecord: locals.userRecord
 		};
 	} catch (error) {
 		console.error(error);

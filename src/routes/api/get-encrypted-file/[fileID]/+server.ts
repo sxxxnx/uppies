@@ -1,11 +1,11 @@
-import { createAdminClient } from '$lib/appwrite.js';
+import { createAdminClient, createSessionClient } from '$lib/appwrite.js';
 import { error } from '@sveltejs/kit';
 
-export async function GET({ params }) {
-	const { fileID } = params;
+export async function GET(event) {
+	const { fileID } = event.params;
 
 	const session = createAdminClient();
-	const record = await session.database.getDocument('uppies', 'posts', fileID);
+	const record = await session.database.getDocument('uppies', 'posts', fileID.toString());
 
 	if (!record) {
 		throw error(404, 'File not found.');
@@ -13,16 +13,23 @@ export async function GET({ params }) {
 
 	const headers = {
 		'Content-Type': 'application/octet-stream',
-		'X-File-Salt': record.encSalt,
-		'X-File-Iv': record.encIv,
 		'X-File-Content-Type': record.contentType,
-		'X-File-Extention': record.fileExtention
+		'X-File-Extension': record.fileExtention
 	};
 
 	const file = await session.storage.getFileView('public', record.fileId);
 
-	return new Response(file, {
-		status: 200,
-		headers
-	});
+	return new Response(
+		JSON.stringify({
+			file: file,
+			encSalt: record.encSalt,
+			encIv: record.encIv,
+			contentType: record.contentType,
+			fileExtension: record.fileExtention
+		}),
+		{
+			status: 200,
+			headers
+		}
+	);
 }

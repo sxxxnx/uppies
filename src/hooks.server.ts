@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/private';
-import { createSessionClient, SESSION_COOKIE } from '$lib/appwrite';
+import { createSessionClient, createAdminClient, SESSION_COOKIE } from '$lib/appwrite';
 import { generateGravatarUrl } from '$lib/util/appwrite';
+import { ID, Query } from 'node-appwrite';
 
 export async function handle({ event, resolve }) {
 	try {
@@ -13,69 +14,70 @@ export async function handle({ event, resolve }) {
 
 		const { account } = createSessionClient(event);
 		const user = await account.get();
-		// Initialize Gravatar URL if not set
-		if (!user.prefs.profilePicture) {
-			console.log('Generating Gravatar for user:', user.email);
-			const gravatarUrl = generateGravatarUrl(user.email);
-			console.log('Generated Gravatar URL:', gravatarUrl);
+		const { database } = createAdminClient();
 
-			await account.updatePrefs({
-				...user.prefs,
-				profilePicture: gravatarUrl
-			});
-			// Update the user object with the new profilePicture
-			user.prefs.profilePicture = gravatarUrl;
-			console.log('Updated user prefs with Gravatar');
-		} else {
-			console.log('User already has profile picture:', user.prefs.profilePicture);
+		// Check if user record exists in database
+		let userRecord;
+		try {
+			const userRecords = await database.listDocuments('uppies', 'user', [
+				Query.equal('userId', user.$id)
+			]);
+
+			userRecord = userRecords.documents[0];
+		} catch (error) {
+			console.log('User record not found, will create new one');
+			userRecord = null;
 		}
-		// Initialize upload cap if not set
-		if (!user.prefs.uploadCap) {
-			// Set initial upload cap and next reset date (1 month from now)
+
+		// Create user record if it doesn't exist
+		if (!userRecord) {
+			const gravatarUrl = generateGravatarUrl(user.email);
 			const nextResetDate = new Date();
 			nextResetDate.setMonth(nextResetDate.getMonth() + 1);
 
-			await account.updatePrefs({
-				...user.prefs,
+			userRecord = await database.createDocument('uppies', 'user', ID.unique(), {
+				userId: user.$id,
+				email: user.email,
+				name: user.name,
+				profilePicture: gravatarUrl,
 				uploadCap: 0,
 				uploadCapSetDate: new Date(),
 				uploadCapResetDate: nextResetDate
 			});
-			// Update the user object with the new prefs
-			user.prefs.uploadCap = 0;
-			user.prefs.uploadCapSetDate = new Date();
-			user.prefs.uploadCapResetDate = nextResetDate;
+
+			console.log('Created new user record with Gravatar');
 		}
-		// Check if it's time to reset the upload cap (monthly reset)
-		if (user.prefs.uploadCapResetDate && new Date() >= new Date(user.prefs.uploadCapResetDate)) {
-			// Only reset if we haven't already reset today (prevent multiple resets)
+
+		// Check if we need to reset upload cap (monthly reset)
+		if (userRecord.uploadCapResetDate && new Date() >= new Date(userRecord.uploadCapResetDate)) {
 			const today = new Date().toDateString();
-			const lastResetDate = user.prefs.uploadCapSetDate
-				? new Date(user.prefs.uploadCapSetDate).toDateString()
+			const lastResetDate = userRecord.uploadCapSetDate
+				? new Date(userRecord.uploadCapSetDate).toDateString()
 				: null;
 
 			if (lastResetDate !== today) {
 				const nextResetDate = new Date();
 				nextResetDate.setMonth(nextResetDate.getMonth() + 1);
 
-				await account.updatePrefs({
-					...user.prefs,
+				userRecord = await database.updateDocument('uppies', 'user', userRecord.$id, {
 					uploadCap: 0, // Reset to 0
 					uploadCapSetDate: new Date(),
 					uploadCapResetDate: nextResetDate
 				});
-				// Update the user object with the reset values
-				user.prefs.uploadCap = 0;
-				user.prefs.uploadCapSetDate = new Date();
-				user.prefs.uploadCapResetDate = nextResetDate;
+
+				console.log('Reset upload cap for user:', user.email);
 			}
 		}
 
+		// Attach user record to locals for use in other parts of the app
 		event.locals.user = user;
+		event.locals.userRecord = userRecord;
+
 	} catch (error) {
-		console.error('Error in hooks:', error);
+		console.error('Authentication error');
 		event.cookies.delete(SESSION_COOKIE, { path: '/' });
 		event.locals.user = undefined;
+		event.locals.userRecord = undefined;
 	}
 
 	return resolve(event);

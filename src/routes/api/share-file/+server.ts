@@ -6,7 +6,8 @@ import { Permission, Role } from 'node-appwrite';
 export async function POST(event) {
 	const formData = await event.request.formData();
 	if (!event.locals.user) throw error(403, 'Unauthorized');
-	if (event.locals.user.prefs.uploadCap >= 100)
+	if (!event.locals.userRecord) throw error(500, 'User record not found');
+	if (event.locals.userRecord.uploadCap >= 100)
 		return error(500, 'You have reached your BETA Upload cap.');
 
 	const userSession = createSessionClient(event);
@@ -22,6 +23,36 @@ export async function POST(event) {
 	const description = formData.get('description') as string;
 	const contentType = formData.get('contentType') as string;
 	const fileExtention = formData.get('fileExtention') as string;
+    const fileSize = formData.get('fileSize') as string
+
+	const allowedContentTypes = [
+		// Common Documents
+		'application/pdf',
+		'text/plain',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+		'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+
+		// Common Image Formats
+		'image/jpeg',
+		'image/png',
+		'image/gif',
+		'image/webp',
+		'image/bmp',
+
+		// Common Audio & Video Formats
+		'video/mp4',
+		'video/webm',
+		'audio/mpeg',
+		'audio/wav',
+
+		// Archives
+		'application/zip',
+		'application/vnd.rar',
+		'application/x-7z-compressed'
+	];
+
+	if (!allowedContentTypes.includes(contentType)) return error(400, 'Unsupported content type.');
 
 	const uploadedFile = await session.storage.createFile('public', ID.unique(), encryptedFile, [
 		Permission.write(Role.user(event.locals.user?.$id)),
@@ -43,19 +74,17 @@ export async function POST(event) {
 		fileId: uploadedFile.$id,
 		contentType,
 		fileExtention: fileExtention ?? '',
-		userId: event.locals.user.$id
-	}); // Only increment upload cap after successful upload and database creation
-	const currentUploadCap = event.locals.user.prefs.uploadCap || 0;
+		userId: event.locals.user.$id	}); // Only increment upload cap after successful upload and database creation
+	const currentUploadCap = event.locals.userRecord.uploadCap || 0;
 	const newUploadCap = currentUploadCap + 1;
 
 	try {
-		await userSession.account.updatePrefs({
-			...event.locals.user.prefs,
+		await session.database.updateDocument('uppies', 'user', event.locals.userRecord.$id, {
 			uploadCap: newUploadCap
 		});
-	} catch (prefError) {
-		console.error('Error updating upload cap:', prefError);
-		// Don't fail the upload if prefs update fails, but log it
+	} catch (updateError) {
+		console.error('Error updating upload cap:', updateError);
+		// Don't fail the upload if user record update fails, but log it
 	}
 
 	return json({ fileID: media.$id }, { status: 201 });

@@ -7,7 +7,8 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-            user: Models.User<Models.Preferences> | undefined
+            user: Models.User<Models.Preferences> | undefined;
+            userRecord: Models.Document | undefined;
         }
 		// interface PageData {}
 		// interface PageState {}

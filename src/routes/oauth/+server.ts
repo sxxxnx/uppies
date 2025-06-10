@@ -23,9 +23,8 @@ export async function GET(event) {
 		const session = await account.createSession(userId, secret);
 
 		console.log('OAuth session created successfully');
-
 		event.cookies.set(SESSION_COOKIE, session.secret, {
-			sameSite: 'lax',
+			sameSite: 'strict',
 			expires: new Date(session.expire),
 			secure: !dev,
 			path: '/',
@@ -37,5 +36,5 @@ export async function GET(event) {
 		redirect(302, `/signup?error=${encodeURIComponent(errorMessage)}`);
 	}
 
-    redirect(302, '/');
+	redirect(302, '/');
 }
