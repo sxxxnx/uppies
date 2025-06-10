@@ -26,7 +26,7 @@
 
 				<section>
 					<h2 class="mb-4 text-xl font-semibold text-white">2. Information We Collect</h2>
-					
+
 					<h3 class="mb-3 text-lg font-medium text-white">2.1 Personal Information</h3>
 					<ul class="mb-4 ml-6 list-disc space-y-2">
 						<li>Email address (for account creation and authentication)</li>
@@ -65,7 +65,7 @@
 
 				<section>
 					<h2 class="mb-4 text-xl font-semibold text-white">4. Data Security and Encryption</h2>
-					
+
 					<h3 class="mb-3 text-lg font-medium text-white">4.1 Client-Side Encryption</h3>
 					<p class="mb-4">
 						We implement client-side encryption to protect your files. This means your files are encrypted on your device before being uploaded to our servers, ensuring that we cannot access the contents of your files.
@@ -87,7 +87,7 @@
 
 				<section>
 					<h2 class="mb-4 text-xl font-semibold text-white">5. Data Sharing and Disclosure</h2>
-					
+
 					<h3 class="mb-3 text-lg font-medium text-white">5.1 No Sale of Personal Data</h3>
 					<p class="mb-4">
 						We do not sell, trade, or otherwise transfer your personal information to third parties for commercial purposes.
@@ -119,7 +119,7 @@
 
 				<section>
 					<h2 class="mb-4 text-xl font-semibold text-white">7. Your Rights and Choices</h2>
-					
+
 					<h3 class="mb-3 text-lg font-medium text-white">7.1 Account Management</h3>
 					<p class="mb-4">You have the right to:</p>
 					<ul class="mb-4 ml-6 list-disc space-y-2">

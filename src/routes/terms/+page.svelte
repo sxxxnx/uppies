@@ -125,7 +125,7 @@
 				<section>
 					<h2 class="mb-4 text-xl font-semibold text-white">6. Privacy and Data Protection</h2>
 					<p class="mb-4">
-						Your privacy is important to us. Our collection and use of personal information is governed by our <a href="/legal/privacy-policy" class="text-accent underline">Privacy Policy</a>, which is incorporated into these Terms by reference.
+						Your privacy is important to us. Our collection and use of personal information is governed by our Privacy Policy, which is incorporated into these Terms by reference.
 					</p>
 					<p class="mb-4">
 						We implement client-side encryption to protect your files, but you remain responsible for maintaining the security of your encryption keys and passwords.

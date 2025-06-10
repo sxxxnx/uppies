@@ -1,8 +1,14 @@
 import crypto from 'crypto';
 
 export function generateGravatarUrl(email: string, size: number = 200) {
-	const hash = crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex');
-	return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
+	try {
+		const hash = crypto.createHash('md5').update(email.toLowerCase().trim()).digest('hex');
+		return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon&r=pg`;
+	} catch (error) {
+		console.error('Error generating Gravatar URL:', error);
+		// Fallback: return a default Gravatar URL without hash
+		return `https://www.gravatar.com/avatar/00000000000000000000000000000000?s=${size}&d=identicon&r=pg`;
+	}
 }
 
 export function getInitials(name: string) {

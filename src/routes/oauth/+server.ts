@@ -31,11 +31,11 @@ export async function GET(event) {
 			path: '/',
 			httpOnly: true
 		});
-
-		redirect(302, '/');
 	} catch (error) {
 		console.error('OAuth session creation failed:', error);
 		const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
 		redirect(302, `/signup?error=${encodeURIComponent(errorMessage)}`);
 	}
+
+    redirect(302, '/');
 }
